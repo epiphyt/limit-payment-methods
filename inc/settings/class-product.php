@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace epiphyt\Limit_Payment_Methods\settings;
 
+use WC_Product;
+
 /**
  * Product settings.
  * 
@@ -31,7 +33,13 @@ final class Product {
 			return;
 		}
 		
-		$disabled_payment_methods = (array) \get_post_meta( \get_the_ID() ?: 0, self::META_KEY, true );
+		$product = \wc_get_product( \get_the_ID() ?: 0 );
+		
+		if ( ! $product instanceof WC_Product ) {
+			return;
+		}
+		
+		$disabled_payment_methods = (array) $product->get_meta( self::META_KEY );
 		
 		echo '<div class="options_group">';
 		
@@ -62,7 +70,12 @@ final class Product {
 	 * @param	int		$product_id Current product ID
 	 */
 	public static function save( int $product_id ): void {
-		$payment_method = ! empty( $_POST[ self::META_KEY ] ) ? \wc_clean( $_POST[ self::META_KEY ] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		\update_post_meta( $product_id, self::META_KEY, $payment_method );
+		$payment_method = ! empty( $_POST[ self::META_KEY ] ) ? \wc_clean( \wp_unslash( $_POST[ self::META_KEY ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$product = \wc_get_product( $product_id );
+		
+		if ( $product instanceof WC_Product ) {
+			$product->update_meta_data( self::META_KEY, $payment_method );
+			$product->save();
+		}
 	}
 }

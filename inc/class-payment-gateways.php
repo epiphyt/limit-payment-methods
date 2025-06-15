@@ -32,8 +32,9 @@ final class Payment_Gateways {
 			return $gateways;
 		}
 		
+		/** @var array{data: \WC_Product} $product_item */
 		foreach ( \WC()->cart->get_cart_contents() as $product_item ) {
-			$disabled_payment_methods = \array_filter( (array) \get_post_meta( $product_item['data']->get_id(), Product::META_KEY, true ) );
+			$disabled_payment_methods = \array_filter( (array) $product_item['data']->get_meta( Product::META_KEY ) );
 			
 			if ( empty( $disabled_payment_methods ) ) {
 				continue;
@@ -66,7 +67,7 @@ final class Payment_Gateways {
 		}
 		
 		foreach ( $order->get_items() as $product_item ) {
-			$disabled_payment_methods = \array_filter( (array) \get_post_meta( $product_item->get_id(), Product::META_KEY, true ) );
+			$disabled_payment_methods = \array_filter( (array) $product_item->get_meta( Product::META_KEY ) );
 			
 			if ( empty( $disabled_payment_methods ) ) {
 				continue;

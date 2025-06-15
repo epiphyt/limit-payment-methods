@@ -15,6 +15,9 @@ Text Domain:		limit-payment-methods
 Domain Path:		/languages
 Requires Plugins:	woocommerce
 
+WC requires at least:	7.0
+WC tested up to:		9.9
+
 Limit Payment Methods is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 2 of the License, or
