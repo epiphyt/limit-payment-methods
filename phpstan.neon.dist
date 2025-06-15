@@ -1,0 +1,7 @@
+parameters:
+  level: 9
+  paths:
+    - inc/
+    - limit-payment-methods.php
+  scanDirectories:
+    - vendor/php-stubs

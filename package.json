@@ -1,0 +1,9 @@
+{
+	"name": "limit-payment-methods",
+	"scripts": {
+		"i18n": "DOMAIN=limit-payment-methods; wp i18n make-pot . ./languages/${DOMAIN}.pot",
+		"po2json": "DOMAIN=limit-payment-methods; HANDLE=limit-payment-methods-editor; LANGS=( de_DE de_DE_formal ); for LANG in ${LANGS[@]}; do po2json languages/${LANG}.po languages/${DOMAIN}-${LANG}-${HANDLE}.json -p -f jed1.x && sed -i.bak s/${LANG/_formal/@formal}/${LANG}/g languages/${DOMAIN}-${LANG}-${HANDLE}.json; done && rm languages/*.bak"
+	},
+	"author": "Epiphyt",
+	"license": "GPL-2.0"
+}
