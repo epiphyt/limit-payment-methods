@@ -1,0 +1,45 @@
+name: Deploy to WordPress.org
+on:
+  push:
+    tags:
+    - "*"
+    - "!*-*"
+jobs:
+  tag:
+    name: New tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    # Run npm build
+    - uses: bahmutov/npm-install@v1
+    - name: npm build
+      run: npm run build
+    - run: mkdir ${{ github.event.repository.name }}-build && rsync -a --exclude-from='.github/exclude_list' . ${{ github.event.repository.name }}-build
+    - run: cd ${{ github.event.repository.name }}-build && zip -r ../${{ github.event.repository.name }}.zip * -x "${{ github.event.repository.name }}-build/*" && cd ..
+    - run: rm -rf ${{ github.event.repository.name }}-build
+    - name: Deploy plugin to kittmedia.com
+      uses: Burnett01/rsync-deployments@7.0.1
+      with:
+        switches: -ahv --exclude-from=".github/exclude_list" --exclude="${{ github.event.repository.name }}.zip" --exclude=".git"
+        path: .
+        remote_path: /home/wp.kittmedia.com/wp-content/plugins/limit-payment-methods
+        remote_host: ${{ secrets.REMOTE_HOST }}
+        remote_user: ${{ secrets.REMOTE_USER }}
+        remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ github.event.repository.name }}.zip
+        name: Release ${{ github.ref_name }}
+  download:
+    name: Download Artifacts
+    needs: [tag]
+    runs-on: ubuntu-latest
+    steps:
+      - name: release
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}.zip
